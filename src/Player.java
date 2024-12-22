@@ -1,16 +1,17 @@
 import java.util.ArrayList;
+import java.util.HashMap;
 
 public class Player {
-    String playerName;
-    int wins;
-    int losses;
-    int draws;
+    private String playerName;
+    private int wins;
+    private int losses;
+    private int draws;
 
-    public Player(String playerName, int wins, int losses, int draws) {
+    public Player(String playerName) {
         this.playerName = playerName;
-        this.wins = wins;
-        this.losses = losses;
-        this.draws = draws;
+        this.wins = 0;
+        this.losses = 0;
+        this.draws = 0;
     }
     public String getPlayerName() {
         return playerName;
@@ -33,7 +34,25 @@ public class Player {
     public void incrementDraws() {
         draws++;
     }
-    public void getStats(){
+    public HashMap<String, Integer> getStats(){
+        HashMap<String, Integer> stats = new HashMap<>();
+        stats.put("wins", wins);
+        stats.put("losses", losses);
+        stats.put("draws", draws);
 
+        return stats;
     }
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Player player = (Player) o;
+        return playerName.equals(player.playerName);
+    }
+
+    @Override
+    public int hashCode() {
+        return playerName.hashCode();
+    }
+
 }

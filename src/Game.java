@@ -11,6 +11,9 @@ public class Game {
         this.playerO = playerO;
         this.engine = engine;
         this.isGameOver = false;
-        
     }
+     public void startGame(){
+        isGameOver = false;
+        engine.initializeBoard();
+     }
 }
