@@ -26,6 +26,7 @@ public class GameEngine {
         board[row][col] = player;
         return true;
     }
+
     public char checkWinner(char player) {
         for (int i = 0; i < 3; i++) {
             if (board[i][0] == player && board[i][1] == player && board[i][2] == player) {
