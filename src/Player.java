@@ -1,5 +1,5 @@
-import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map;
 
 public class Player {
     private String playerName;
@@ -34,8 +34,8 @@ public class Player {
     public void incrementDraws() {
         draws++;
     }
-    public HashMap<String, Integer> getStats(){
-        HashMap<String, Integer> stats = new HashMap<>();
+    public Map<String, Integer> getStats(){
+        Map<String, Integer> stats = new HashMap<>();
         stats.put("wins", wins);
         stats.put("losses", losses);
         stats.put("draws", draws);
