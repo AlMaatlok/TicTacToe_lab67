@@ -31,7 +31,7 @@ public class Game {
             return false;
         }
 
-        char winner = engine.checkWinner(player);
+        char winner = engine.checkWinner();
         if(winner != ' '){
             endGame("Player " + player + " wins!");
             isGameOver = true;

@@ -27,22 +27,28 @@ public class GameEngine {
         return true;
     }
 
-    public char checkWinner(char player) {
+    public char checkWinner() {
         for (int i = 0; i < 3; i++) {
-            if (board[i][0] == player && board[i][1] == player && board[i][2] == player) {
-                return player;
+            if (board[i][0] != ' ' && board[i][0] == board[i][1] && board[i][1] == board[i][2]) {
+                return board[i][0];
             }
         }
 
         for (int i = 0; i < 3; i++) {
-            if (board[0][i] == player && board[1][i] == player && board[2][i] == player) {
-                return player;
+            if (board[0][i] != ' ' && board[0][i] == board[1][i] && board[1][i] == board[2][i]) {
+                return board[0][i];
             }
         }
 
-        if ((board[0][0] == player && board[1][1] == player && board[2][2] == player) ||
-                (board[0][2] == player && board[1][1] == player && board[2][0] == player)) {
-            return player;
+        if (board[0][0] != ' ' && board[0][0] == board[1][1] && board[1][1] == board[2][2]) {
+            return board[0][0];
+        }
+        if (board[0][2] != ' ' && board[0][2] == board[1][1] && board[1][1] == board[2][0]) {
+            return board[0][2];
+        }
+
+        if (isBoardFull()) {
+            return 'D';
         }
 
         return ' ';
@@ -58,7 +64,7 @@ public class GameEngine {
         return true;
     }
 
-    public void resetGame(char currentPlayer){
+    public void resetGame(){
         initializeBoard();
     }
     public boolean isMoveValid(int row, int col){
