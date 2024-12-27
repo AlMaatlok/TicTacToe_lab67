@@ -1,3 +1,8 @@
+package room;
+
+import core.GameEngine;
+import core.Player;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -114,10 +119,10 @@ public class Room {
 
         if (winner == 'X') {
             notifyObservers("winX");
-            return "Player X won!";
+            return "Core.Player X won!";
         } else if (winner == 'O') {
             notifyObservers("winO");
-            return "Player O won!";
+            return "Core.Player O won!";
         } else if (gameEngine.isBoardFull()) {
             notifyObservers("draw");
             return "It's a draw!";

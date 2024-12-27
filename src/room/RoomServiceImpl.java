@@ -1,9 +1,14 @@
+package room;
+
+import core.GameEngine;
+import core.Player;
+
 import java.rmi.RemoteException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class RoomServiceImpl implements RoomServiceInterface{
+public class RoomServiceImpl implements RoomServiceInterface {
     private static Map<String, Room> rooms = new HashMap<>();
     private static List<Player> players;
     private GameEngine game;
@@ -23,7 +28,7 @@ public class RoomServiceImpl implements RoomServiceInterface{
     @Override
     public boolean joinRoom(String playerToken, String roomToken, String password)  {
         if(!rooms.containsKey(roomToken)){
-            System.out.println("Room doesn't exist.");
+            System.out.println("room.Room doesn't exist.");
             return false;
         }
 
@@ -43,7 +48,7 @@ public class RoomServiceImpl implements RoomServiceInterface{
                     return true;
                 }
                 else {
-                    System.out.println("Room is full.");
+                    System.out.println("room.Room is full.");
                     return false;
                 }
             }
@@ -57,23 +62,23 @@ public class RoomServiceImpl implements RoomServiceInterface{
     @Override
     public boolean leaveRoom(String playerToken, String roomToken)  {
         if(!rooms.containsKey(roomToken)){
-            System.out.println("Room doesn't exist.");
+            System.out.println("room.Room doesn't exist.");
             return false;
         }
 
         Room room = rooms.get(roomToken);
         if(room.getPlayerX() != null && room.getPlayerX().equals(playerToken)){
             room.setPlayerX(null);
-            System.out.println("Player X left the room.");
+            System.out.println("Core.Player X left the room.");
             return true;
         }
         else if(room.getPlayerO() != null && room.getPlayerO().equals(playerToken)){
             room.setPlayerO(null);
-            System.out.println("Player O left the room.");
+            System.out.println("Core.Player O left the room.");
             return true;
         }
         else{
-            System.out.println("Player not found in the room.");
+            System.out.println("Core.Player not found in the room.");
             return false;
         }
     }
@@ -81,7 +86,7 @@ public class RoomServiceImpl implements RoomServiceInterface{
     @Override
     public int resetRoom(String playerToken, String roomToken)  {
         if(!rooms.containsKey(roomToken)){
-            System.out.println("Room doesn't exist.");
+            System.out.println("room.Room doesn't exist.");
             return -1;
         }
 
@@ -89,11 +94,11 @@ public class RoomServiceImpl implements RoomServiceInterface{
         if(room.getPlayerX() != null && room.getPlayerX().equals(playerToken) ||
                 room.getPlayerO() != null && room.getPlayerO().equals(playerToken)){
             room.resetRoom();
-            System.out.println("Room reset successful.");
+            System.out.println("room.Room reset successful.");
             return 1;
         }
         else{
-            System.out.println("Player not found in the room.");
+            System.out.println("Core.Player not found in the room.");
             return -1;
         }
     }
@@ -132,7 +137,7 @@ public class RoomServiceImpl implements RoomServiceInterface{
     @Override
     public boolean deleteRoom(String roomToken, String password)  {
         if(!rooms.containsKey(roomToken)){
-            System.out.println("Room doesn't exist.");
+            System.out.println("room.Room doesn't exist.");
             return false;
         }
         else{
@@ -155,7 +160,7 @@ public class RoomServiceImpl implements RoomServiceInterface{
     public void listRooms()  {
         List<Room> rooms = sessionManager.getAllSessions();
            for(Room room : rooms){
-               System.out.println("Room: " + room.getRoomName() + ", token: " + room.getRoomToken() + ", number of players: " + room.getPlayersNumber() + "/2\\n");
+               System.out.println("room.Room: " + room.getRoomName() + ", token: " + room.getRoomToken() + ", number of players: " + room.getPlayersNumber() + "/2\\n");
            }
     }
 }

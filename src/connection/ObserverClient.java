@@ -1,3 +1,5 @@
+package connection;
+
 public class ObserverClient {
 
     public void update(String message, String boardInfo) {
@@ -8,10 +10,10 @@ public class ObserverClient {
             System.out.println("New move by a player.");
         }
         else if(message == "winX"){
-            System.out.println("Player X won!!");
+            System.out.println("Core.Player X won!!");
         }
         else if(message == "winO"){
-            System.out.println("Player O won!!");
+            System.out.println("Core.Player O won!!");
         }
         else if(message == "draw"){
             System.out.println("Draw! No winner.");

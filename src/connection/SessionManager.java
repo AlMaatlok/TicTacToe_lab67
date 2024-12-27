@@ -1,3 +1,8 @@
+package connection;
+
+import core.GameEngine;
+import room.Room;
+
 import java.util.*;
 
 public class SessionManager {
@@ -6,7 +11,7 @@ public class SessionManager {
     public Room createSession(String roomName, String password) {
         String token = UUID.randomUUID() + "@" + roomName;
         if (sessions.containsKey(token)) {
-            throw new IllegalArgumentException("Room with this token already exists.");
+            throw new IllegalArgumentException("room.Room with this token already exists.");
         }
         Room room = new Room(roomName, password, null, null, new GameEngine());
         sessions.put(token, room);
@@ -15,14 +20,14 @@ public class SessionManager {
 
     public Room getSession(String roomToken) {
         if (!sessions.containsKey(roomToken)) {
-            throw new IllegalArgumentException("Room not found.");
+            throw new IllegalArgumentException("room.Room not found.");
         }
         return sessions.get(roomToken);
     }
 
     public void removeSession(String roomToken) {
         if (!sessions.containsKey(roomToken)) {
-            throw new IllegalArgumentException("Room not found.");
+            throw new IllegalArgumentException("room.Room not found.");
         }
         sessions.remove(roomToken);
     }

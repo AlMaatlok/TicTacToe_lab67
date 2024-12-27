@@ -1,3 +1,5 @@
+package core;
+
 public class GameEngine {
     char[][] board;
     char currentPlayer;
