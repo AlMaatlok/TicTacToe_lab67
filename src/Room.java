@@ -109,7 +109,7 @@ public class Room {
         return false;
     }
 
-    public String checkWinner(Player player) {
+    public String checkWinner() {
         char winner = gameEngine.checkWinner();
 
         if (winner == 'X') {
@@ -123,6 +123,16 @@ public class Room {
             return "It's a draw!";
         }
         return "Game ongoing.";
+    }
+    public int getPlayersNumber(){
+        int number = 0;
+        if(playerX != null) {
+            number++;
+        }
+        else if(playerO != null) {
+            number++;
+        }
+        return number;
     }
 
     public void addObserver(ObserverClient observer) {
@@ -186,4 +196,3 @@ public class Room {
         this.observers = observers;
     }
 }
-

@@ -79,7 +79,4 @@ public class GameEngine {
     public void setCurrentPlayer(char currentPlayer) {
         this.currentPlayer = currentPlayer;
     }
-    public void setBoard(char[][] board) {
-        this.board = board;
-    }
 }
