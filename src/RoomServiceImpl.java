@@ -9,6 +9,7 @@ public class RoomServiceImpl implements RoomServiceInterface{
     private static Map<String, Room> rooms = new HashMap<>();
     private static List<Player> players;
     private GameEngine game;
+    private final SessionManager sessionManager = new SessionManager();
 
     public RoomServiceImpl()  throws RemoteException {
         super();
@@ -16,12 +17,8 @@ public class RoomServiceImpl implements RoomServiceInterface{
 
     @Override
     public String createRoom(String password, String roomName) throws RemoteException {
-        String token = UUID.randomUUID() + "@" + roomName;
-        if(rooms.containsKey(token)){
-            return "Cannot create room with the same token. Room already exists.";
-        }
-        rooms.put(token, new Room(roomName, password, null, null, game));
-        return "Created room with token " + roomName + "You can connect to it via token: " + token;
+        Room room = sessionManager.createSession(roomName, password);
+        return "Created room with token " + roomName + "You can connect to it via token: " + room.getRoomToken();
     }
 
     @Override
@@ -157,16 +154,9 @@ public class RoomServiceImpl implements RoomServiceInterface{
 
     @Override
     public void listRooms() throws RemoteException {
-       if(rooms.isEmpty()){
-           System.out.println("No active rooms.");
-       }
-       else{
-           for(Map.Entry<String, Room> entry : rooms.entrySet()){
-               String token = entry.getKey();
-               Room room = entry.getValue();
-               System.out.println("Room: " + room.getRoomName() + ", token: " + token + ", number of players: " + room.getPlayersNumber() + "/2\\n");
+        List<Room> rooms = sessionManager.getAllSessions();
+           for(Room room : rooms){
+               System.out.println("Room: " + room.getRoomName() + ", token: " + room.getRoomToken() + ", number of players: " + room.getPlayersNumber() + "/2\\n");
            }
-       }
-
     }
 }
