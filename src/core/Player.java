@@ -5,15 +5,20 @@ import java.util.Map;
 
 public class Player {
     private String playerName;
+    private char symbol;
     private int wins;
     private int losses;
     private int draws;
 
-    public Player(String playerName) {
+    public Player(String playerName, char symbol) {
         this.playerName = playerName;
+        this.symbol = symbol;
         this.wins = 0;
         this.losses = 0;
         this.draws = 0;
+    }
+    public char getSymbol() {
+        return symbol;
     }
     public String getPlayerName() {
         return playerName;
@@ -38,9 +43,9 @@ public class Player {
     }
     public Map<String, Integer> getStats(){
         Map<String, Integer> stats = new HashMap<>();
-        stats.put("wins", wins);
-        stats.put("losses", losses);
-        stats.put("draws", draws);
+        stats.put("wins", getWins());
+        stats.put("losses", getLosses());
+        stats.put("draws", getDraws());
 
         return stats;
     }

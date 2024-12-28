@@ -11,23 +11,23 @@ public class SessionManager {
     public Room createSession(String roomName, String password) {
         String token = UUID.randomUUID() + "@" + roomName;
         if (sessions.containsKey(token)) {
-            throw new IllegalArgumentException("room.Room with this token already exists.");
+            throw new IllegalArgumentException("Room with this token already exists.");
         }
-        Room room = new Room(roomName, password, null, null, new GameEngine());
+        Room room = new Room(roomName, password, token);
         sessions.put(token, room);
         return room;
     }
 
     public Room getSession(String roomToken) {
         if (!sessions.containsKey(roomToken)) {
-            throw new IllegalArgumentException("room.Room not found.");
+            throw new IllegalArgumentException("Room not found.");
         }
         return sessions.get(roomToken);
     }
 
     public void removeSession(String roomToken) {
         if (!sessions.containsKey(roomToken)) {
-            throw new IllegalArgumentException("room.Room not found.");
+            throw new IllegalArgumentException("Room not found.");
         }
         sessions.remove(roomToken);
     }

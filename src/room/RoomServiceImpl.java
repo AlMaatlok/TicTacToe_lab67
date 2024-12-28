@@ -1,14 +1,16 @@
 package room;
 
+import connection.SessionManager;
 import core.GameEngine;
 import core.Player;
 
 import java.rmi.RemoteException;
+import java.rmi.server.UnicastRemoteObject;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class RoomServiceImpl implements RoomServiceInterface {
+public class RoomServiceImpl extends UnicastRemoteObject implements RoomServiceInterface {
     private static Map<String, Room> rooms = new HashMap<>();
     private static List<Player> players;
     private GameEngine game;
@@ -22,6 +24,7 @@ public class RoomServiceImpl implements RoomServiceInterface {
     @Override
     public String createRoom(String password, String roomName)  {
         Room room = sessionManager.createSession(roomName, password);
+        rooms.put(room.getRoomToken(), room);
         return "Created room with token " + roomName + "You can connect to it via token: " + room.getRoomToken();
     }
 
@@ -60,28 +63,30 @@ public class RoomServiceImpl implements RoomServiceInterface {
     }
 
     @Override
-    public boolean leaveRoom(String playerToken, String roomToken)  {
-        if(!rooms.containsKey(roomToken)){
-            System.out.println("room.Room doesn't exist.");
-            return false;
-        }
+    public void leaveRoom(String roomId, String playerName) throws RemoteException {
+        removePlayerFromRoom(playerName);
 
-        Room room = rooms.get(roomToken);
-        if(room.getPlayerX() != null && room.getPlayerX().equals(playerToken)){
-            room.setPlayerX(null);
-            System.out.println("Core.Player X left the room.");
-            return true;
-        }
-        else if(room.getPlayerO() != null && room.getPlayerO().equals(playerToken)){
-            room.setPlayerO(null);
-            System.out.println("Core.Player O left the room.");
-            return true;
-        }
-        else{
-            System.out.println("Core.Player not found in the room.");
-            return false;
+        notifyPlayersAboutLeave(playerName);
+    }
+
+    @Override
+    public void notifyPlayersAboutLeave(String playerName) throws RemoteException {
+        for (Player player : players) {
+            if (!player.getPlayerName().equals(playerName)) {
+                System.out.println("Gracz " + playerName + " opuścił pokój.");
+            }
         }
     }
+
+    public void removePlayerFromRoom(String playerName) {
+        players.removeIf(player -> player.getPlayerName().equals(playerName));
+        System.out.println("Gracz " + playerName + " został usunięty z pokoju.");
+    }
+
+    public void addPlayer(Player player) {
+        players.add(player);
+    }
+
 
     @Override
     public int resetRoom(String playerToken, String roomToken)  {
@@ -104,9 +109,11 @@ public class RoomServiceImpl implements RoomServiceInterface {
     }
 
     @Override
-    public int checkPlayersInRoom(String token)  {
-        return 0;
+    public int checkPlayersInRoom(String token) {
+        Room room = sessionManager.getSession(token);
+        return room.getPlayersNumber();
     }
+
 
     @Override
     public boolean hasRoomWithToken(String roomToken)  {
@@ -115,13 +122,18 @@ public class RoomServiceImpl implements RoomServiceInterface {
 
     @Override
     public String getOponent(String roomToken, String playerToken) {
-        return null;
+        Room room = sessionManager.getSession(roomToken);
+        if (room.getPlayerX().getPlayerName().equals(playerToken)) {
+            return room.getPlayerO().getPlayerName();
+        } else {
+            return room.getPlayerX().getPlayerName();
+        }
     }
 
+
     @Override
-    public boolean isYourTurn(String roomToken, String playerToken)  {
-        return true;
-        //return  rooms.get(roomToken).isYourTurn();
+    public boolean isYourTurn(Player player)  {
+        return game.getCurrentPlayer().equals(player);
     }
 
     @Override
@@ -147,8 +159,13 @@ public class RoomServiceImpl implements RoomServiceInterface {
     }
 
     @Override
-    public boolean makeMove(String token, String roomToken, int row, int col)  {
-        //return rooms.get(roomToken).makeMove()
+    public boolean makeMove(String roomToken, String playerToken, int row, int col) {
+
+        Room room = sessionManager.getSession(roomToken);
+
+        Player player = room.getPlayerX().getPlayerName().equals(playerToken) ? room.getPlayerX() : room.getPlayerO();
+
+        return room.makeMove(player, row, col);
     }
 
     @Override

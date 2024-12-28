@@ -1,62 +1,49 @@
 package room;
 
+import connection.ObserverClient;
 import core.GameEngine;
 import core.Player;
 
-import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 public class Room {
     String roomToken;
     String roomName;
     String password;
-    Player playerX;
-    Player playerO;
+    Player playersTurn;
     GameEngine gameEngine;
     boolean isGameInProgress;
     List<ObserverClient> observers;
+    private HashMap<String, Player> players;
 
-    public Room(String roomName, String password, Player playerX, Player playerO, GameEngine gameEngine) {
-        this.roomName = roomName;
-        this.password = password;
-        this.playerX = playerX;
-        this.playerO = playerO;
-        this.gameEngine = gameEngine;
-        this.isGameInProgress = false;
-        this.observers = new ArrayList<ObserverClient>();
+    public Room(String roomName, String password, String roomToken) {
+       this.setRoomName(roomName);
+       this.setPassword(password);
+       this.setRoomToken(roomToken);
+       players = new HashMap();
+
     }
 
-    boolean joinRoom(Player player, String password) {
-        if(password.equals(this.password)) {
-            if(playerO == null) {
-                playerO = player;
+    public boolean joinRoom(Player player, String password) {
+        if (password.equals(this.password)) {
+            if (players.size() < 2) {
+                String token = (players.size() == 0) ? "X" : "O";
+                players.put(token, player);
+                return true;
             }
-            else if(playerX == null) {
-                playerX = player;
-            }
-            else{
-                return false;
-            }
-            return true;
-        }
-        else {
             return false;
-        }
-    }
-
-    boolean leaveRoom(Player player) {
-        if(player == null){
-            return false;
-        }
-        if(playerX.equals(player)) {
-            playerX = null;
-            return true;
-        }
-        else if(playerO.equals(player)) {
-            playerO = null;
-            return true;
         }
         return false;
+    }
+
+    public boolean leaveRoom(Player player) {
+        if (player == null) {
+            return false;
+        }
+
+        players.values().remove(player);
+        return true;
     }
 
     public void resetRoom(){
@@ -67,49 +54,35 @@ public class Room {
     public String getBoardInfo(){
         char[][] board = gameEngine.getBoard();
 
-        return  " ┌───┬───┬───┐\\n" +
-                " | " + board[0][0] + " | " + board[0][1] + " | " + board[0][2] + " |\\n "
+        return  " ┌───┬───┬───┐\n" +
+                " | " + board[0][0] + " | " + board[0][1] + " | " + board[0][2] + " |\n "
                 + " ├───┼───┼───┤\n     " +
-                " | " + board[1][0] + " | " + board[1][1] + " | " + board[1][2] + " |\\n"
+                " | " + board[1][0] + " | " + board[1][1] + " | " + board[1][2] + " |\n"
                 + " ├───┼───┼───┤\n     " +
-                " | " + board[2][0] + " | " + board[2][1] + " | " + board[2][2] + " |\\n"
+                " | " + board[2][0] + " | " + board[2][1] + " | " + board[2][2] + " |\n"
                 + " └───┴───┴───┘   ";
 
     }
 
     public String getPlayerWhosTurn(){
-        char currentPlayer = gameEngine.getCurrentPlayer();
-        if(currentPlayer == 'X') {
-            return "X";
-        }
-        else if(currentPlayer == 'O') {
-            return "O";
-        }
-        else {
-            return "";
-        }
+        return (gameEngine.getCurrentPlayer() == 'X') ? "X" : "O";
     }
 
     public boolean isYourTurn(Player player){
-        gameEngine.getCurrentPlayer();
-        if(player == playerX && getPlayerWhosTurn().equals("X")) {
+        String currentPlayerToken = getPlayerWhosTurn();
+        if (players.get(currentPlayerToken) == player) {
             return true;
         }
-        else if(player == playerO && getPlayerWhosTurn().equals("O")) {
-            return true;
-        }
-        else {
-            return false;
-        }
+        return false;
     }
     public boolean makeMove(Player player, int row, int col) {
-        char playerChar = ' ';
-        if(isYourTurn(player)) {
-            playerChar = (player.equals(playerX)) ? 'X' : 'O';
-            if (gameEngine.makeMove(row, col, playerChar)) {
+        String playerToken = (players.get("X") == player) ? "X" : "O";
+        if (gameEngine.makeMove(row, col)) {
+            String winnerStatus = checkWinner();
+            if (winnerStatus.equals("Game ongoing.")) {
                 notifyObservers("move");
-                return true;
             }
+            return true;
         }
         return false;
     }
@@ -119,26 +92,29 @@ public class Room {
 
         if (winner == 'X') {
             notifyObservers("winX");
-            return "Core.Player X won!";
+            players.get("X").incrementWins();
+            players.get("O").incrementLosses();
+            return "Player X won!";
         } else if (winner == 'O') {
             notifyObservers("winO");
-            return "Core.Player O won!";
+            players.get("O").incrementWins();
+            players.get("X").incrementLosses();
+            return "Player O won!";
         } else if (gameEngine.isBoardFull()) {
             notifyObservers("draw");
+            players.get("O").incrementDraws();
+            players.get("X").incrementDraws();
             return "It's a draw!";
         }
         return "Game ongoing.";
     }
     public int getPlayersNumber(){
-        int number = 0;
-        if(playerX != null) {
-            number++;
-        }
-        else if(playerO != null) {
-            number++;
-        }
-        return number;
+        return players.size();
     }
+    public boolean isFull() {
+        return players.size() == 2;
+    }
+
 
     public void addObserver(ObserverClient observer) {
         observers.add(observer);
@@ -170,24 +146,6 @@ public class Room {
     public void setPassword(String password) {
         this.password = password;
     }
-    public Player getPlayerX() {
-        return playerX;
-    }
-    public void setPlayerX(Player playerX) {
-        this.playerX = playerX;
-    }
-    public Player getPlayerO() {
-        return playerO;
-    }
-    public void setPlayerO(Player playerO) {
-        this.playerO = playerO;
-    }
-    public GameEngine getGameEngine() {
-        return gameEngine;
-    }
-    public void setGameEngine(GameEngine gameEngine) {
-        this.gameEngine = gameEngine;
-    }
     public boolean isGameInProgress() {
         return isGameInProgress;
     }
@@ -200,4 +158,11 @@ public class Room {
     public void setObservers(List<ObserverClient> observers) {
         this.observers = observers;
     }
+    public Player getPlayersTurn(){
+        return playersTurn;
+    }
+    public void setPlayersTurn(Player player){
+        playersTurn = player;
+    }
+
 }
