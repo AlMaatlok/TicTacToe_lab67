@@ -164,5 +164,10 @@ public class Room {
     public void setPlayersTurn(Player player){
         playersTurn = player;
     }
-
+    public HashMap<String, Player> getPlayers() {
+        return players;
+    }
+    public void setPlayers(HashMap<String, Player> players) {
+        this.players = players;
+    }
 }

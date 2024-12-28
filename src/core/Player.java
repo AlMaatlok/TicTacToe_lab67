@@ -5,20 +5,15 @@ import java.util.Map;
 
 public class Player {
     private String playerName;
-    private char symbol;
     private int wins;
     private int losses;
     private int draws;
 
-    public Player(String playerName, char symbol) {
+    public Player(String playerName) {
         this.playerName = playerName;
-        this.symbol = symbol;
         this.wins = 0;
         this.losses = 0;
         this.draws = 0;
-    }
-    public char getSymbol() {
-        return symbol;
     }
     public String getPlayerName() {
         return playerName;

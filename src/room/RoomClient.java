@@ -7,7 +7,6 @@ import java.rmi.server.UnicastRemoteObject;
 
 public class RoomClient {
     private RoomServiceInterface roomService;
-    private String serverAddress;
     private String playerName;
     private String roomId;
 
@@ -17,6 +16,18 @@ public class RoomClient {
         this.roomId = roomId;
     }
 
+    public void makeMove(int x, int y) throws RemoteException {
+        try {
+            boolean success = roomService.makeMove(playerName, roomId, x, y);
+            if (success) {
+                System.out.println("Move made at position (" + x + ", " + y + ")");
+            } else {
+                System.out.println("Move failed. Try again.");
+            }
+        } catch (Exception e) {
+            System.out.println("Error making move: " + e.getMessage());
+        }
+    }
     public void connectToServer(String serverAddress) {
         try {
             Registry registry = LocateRegistry.getRegistry(serverAddress);
@@ -65,10 +76,10 @@ public class RoomClient {
 
             UnicastRemoteObject.unexportObject(roomService, true);
 
-            System.out.println("Gracz " + playerName + " opuścił pokój.");
+            System.out.println("Player " + playerName + " left the room.");
 
         } catch (RemoteException e) {
-            System.out.println("Błąd podczas opuszczania pokoju: " + e.getMessage());
+            System.out.println("Error leaving the room " + e.getMessage());
         }
     }
 

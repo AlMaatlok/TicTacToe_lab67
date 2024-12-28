@@ -20,7 +20,7 @@ public interface RoomServiceInterface extends Remote{
 
     String getOponent(String roomToken, String playerToken) throws RemoteException;
 
-    boolean isYourTurn(Player player) throws RemoteException;
+    boolean isYourTurn(String playerToken) throws RemoteException;
 
     String getPlayerWhosTurn(String roomToken) throws RemoteException;
 

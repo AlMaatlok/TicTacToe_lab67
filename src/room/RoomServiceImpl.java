@@ -30,35 +30,25 @@ public class RoomServiceImpl extends UnicastRemoteObject implements RoomServiceI
 
     @Override
     public boolean joinRoom(String playerToken, String roomToken, String password)  {
-        if(!rooms.containsKey(roomToken)){
-            System.out.println("room.Room doesn't exist.");
+        if (!rooms.containsKey(roomToken)) {
+            System.out.println("Room doesn't exist.");
             return false;
         }
 
-        else{
-            Room room = rooms.get(roomToken);
-
-            if (room.getPassword().equals(password)) {
-
-                if (room.getPlayerX() == null) {
-                    room.setPlayerX(new Player(playerToken));
-                    System.out.println("Joined as player X");
-                    return true;
-                }
-                else if (room.getPlayerO() == null) {
-                    room.setPlayerO(new Player(playerToken));
-                    System.out.println("Joined as player O");
-                    return true;
-                }
-                else {
-                    System.out.println("room.Room is full.");
-                    return false;
-                }
-            }
-            else{
-                System.out.println("Invalid password.");
+        Room room = rooms.get(roomToken);
+        if (room.getPassword().equals(password)) {
+            if (room.getPlayers().size() < 2) {
+                String token = (room.getPlayers().size() == 0) ? "X" : "O";
+                room.getPlayers().put(token, new Player(playerToken));
+                System.out.println("Joined as player " + token);
+                return true;
+            } else {
+                System.out.println("Room is full.");
                 return false;
             }
+        } else {
+            System.out.println("Invalid password.");
+            return false;
         }
     }
 
@@ -90,20 +80,19 @@ public class RoomServiceImpl extends UnicastRemoteObject implements RoomServiceI
 
     @Override
     public int resetRoom(String playerToken, String roomToken)  {
-        if(!rooms.containsKey(roomToken)){
-            System.out.println("room.Room doesn't exist.");
+        if (!rooms.containsKey(roomToken)) {
+            System.out.println("Room doesn't exist.");
             return -1;
         }
 
         Room room = rooms.get(roomToken);
-        if(room.getPlayerX() != null && room.getPlayerX().equals(playerToken) ||
-                room.getPlayerO() != null && room.getPlayerO().equals(playerToken)){
+        if (room.getPlayers().containsKey("X") && room.getPlayers().get("X").getPlayerName().equals(playerToken) ||
+                room.getPlayers().containsKey("O") && room.getPlayers().get("O").getPlayerName().equals(playerToken)) {
             room.resetRoom();
-            System.out.println("room.Room reset successful.");
+            System.out.println("Room reset successful.");
             return 1;
-        }
-        else{
-            System.out.println("Core.Player not found in the room.");
+        } else {
+            System.out.println("Player not found in the room.");
             return -1;
         }
     }
@@ -123,17 +112,14 @@ public class RoomServiceImpl extends UnicastRemoteObject implements RoomServiceI
     @Override
     public String getOponent(String roomToken, String playerToken) {
         Room room = sessionManager.getSession(roomToken);
-        if (room.getPlayerX().getPlayerName().equals(playerToken)) {
-            return room.getPlayerO().getPlayerName();
-        } else {
-            return room.getPlayerX().getPlayerName();
-        }
+        String opponentToken = playerToken.equals("X") ? "O" : "X";
+        return room.getPlayers().get(opponentToken).getPlayerName();
     }
 
 
     @Override
-    public boolean isYourTurn(Player player)  {
-        return game.getCurrentPlayer().equals(player);
+    public boolean isYourTurn(String playerToken) {
+        return rooms.containsKey(playerToken);
     }
 
     @Override
@@ -143,7 +129,11 @@ public class RoomServiceImpl extends UnicastRemoteObject implements RoomServiceI
 
     @Override
     public String getBoardInfo(String roomToken)  {
-        return rooms.get(roomToken).getBoardInfo();
+        Room room = rooms.get(roomToken);
+        if (room == null) {
+            throw new IllegalArgumentException("Pokój o podanym tokenie nie istnieje.");
+        }
+        return room.getBoardInfo();
     }
 
     @Override
@@ -160,11 +150,8 @@ public class RoomServiceImpl extends UnicastRemoteObject implements RoomServiceI
 
     @Override
     public boolean makeMove(String roomToken, String playerToken, int row, int col) {
-
         Room room = sessionManager.getSession(roomToken);
-
-        Player player = room.getPlayerX().getPlayerName().equals(playerToken) ? room.getPlayerX() : room.getPlayerO();
-
+        Player player = room.getPlayers().get(playerToken);
         return room.makeMove(player, row, col);
     }
 
