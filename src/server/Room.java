@@ -1,11 +1,7 @@
-package room;
-
-import connection.ObserverClient;
-import core.GameEngine;
-import core.Player;
+package server;
 
 import java.util.HashMap;
-import java.util.List;
+
 
 public class Room {
     String roomToken;
@@ -14,27 +10,35 @@ public class Room {
     Player playersTurn;
     GameEngine gameEngine;
     boolean isGameInProgress;
-    List<ObserverClient> observers;
     private HashMap<String, Player> players;
 
     public Room(String roomName, String password, String roomToken) {
-       this.setRoomName(roomName);
-       this.setPassword(password);
-       this.setRoomToken(roomToken);
-       players = new HashMap();
+        this.setRoomName(roomName);
+        this.setPassword(password);
+        this.setRoomToken(roomToken);
+        this.players = new HashMap();
+        this.gameEngine = new GameEngine();
 
     }
-
-    public boolean joinRoom(Player player, String password) {
-        if (password.equals(this.password)) {
-            if (players.size() < 2) {
-                String token = (players.size() == 0) ? "X" : "O";
-                players.put(token, player);
-                return true;
-            }
-            return false;
+    public int joinRoom(String playerName, String password) {
+        if(!password.equals(this.password)) {
+            return -1;
         }
-        return false;
+        if(getPlayersNumber() >= 2) return -2;
+
+        if(players.isEmpty()){
+            players.put("X", new Player(playerName));
+            System.out.println("Player " + playerName + " joined the game");
+            System.out.println("Number of players: " + players.size());
+            return 1;
+        }
+        else{
+            players.put("O", new Player(playerName));
+            System.out.println("Player " + playerName + " joined the game");
+            System.out.println("Number of players: " + players.size());
+            return 2;
+        }
+
     }
 
     public boolean leaveRoom(Player player) {
@@ -49,18 +53,17 @@ public class Room {
     public void resetRoom(){
         isGameInProgress = false;
         gameEngine.resetGame();
-        notifyObservers("reset");
     }
     public String getBoardInfo(){
         char[][] board = gameEngine.getBoard();
 
         return  " ┌───┬───┬───┐\n" +
-                " | " + board[0][0] + " | " + board[0][1] + " | " + board[0][2] + " |\n "
-                + " ├───┼───┼───┤\n     " +
-                " | " + board[1][0] + " | " + board[1][1] + " | " + board[1][2] + " |\n"
-                + " ├───┼───┼───┤\n     " +
-                " | " + board[2][0] + " | " + board[2][1] + " | " + board[2][2] + " |\n"
-                + " └───┴───┴───┘   ";
+                " | " + board[0][0] + " | " + board[0][1] + " | " + board[0][2] + " |\n" +
+                " ├───┼───┼───┤\n" +
+                " | " + board[1][0] + " | " + board[1][1] + " | " + board[1][2] + " |\n" +
+                " ├───┼───┼───┤\n" +
+                " | " + board[2][0] + " | " + board[2][1] + " | " + board[2][2] + " |\n" +
+                " └───┴───┴───┘";
 
     }
 
@@ -79,9 +82,6 @@ public class Room {
         String playerToken = (players.get("X") == player) ? "X" : "O";
         if (gameEngine.makeMove(row, col)) {
             String winnerStatus = checkWinner();
-            if (winnerStatus.equals("Game ongoing.")) {
-                notifyObservers("move");
-            }
             return true;
         }
         return false;
@@ -91,41 +91,23 @@ public class Room {
         char winner = gameEngine.checkWinner();
 
         if (winner == 'X') {
-            notifyObservers("winX");
             players.get("X").incrementWins();
             players.get("O").incrementLosses();
             return "Player X won!";
         } else if (winner == 'O') {
-            notifyObservers("winO");
             players.get("O").incrementWins();
             players.get("X").incrementLosses();
             return "Player O won!";
         } else if (gameEngine.isBoardFull()) {
-            notifyObservers("draw");
             players.get("O").incrementDraws();
             players.get("X").incrementDraws();
             return "It's a draw!";
         }
         return "Game ongoing.";
     }
+
     public int getPlayersNumber(){
         return players.size();
-    }
-    public boolean isFull() {
-        return players.size() == 2;
-    }
-
-
-    public void addObserver(ObserverClient observer) {
-        observers.add(observer);
-        getBoardInfo();
-    }
-
-    public void notifyObservers(String update) {
-        String boardInfo = getBoardInfo();
-        for(ObserverClient observer : observers) {
-            observer.update(update, boardInfo);
-        }
     }
 
     public String getRoomToken() {
@@ -152,12 +134,6 @@ public class Room {
     public void setGameInProgress(boolean gameInProgress) {
         isGameInProgress = gameInProgress;
     }
-    public List<ObserverClient> getObservers() {
-        return observers;
-    }
-    public void setObservers(List<ObserverClient> observers) {
-        this.observers = observers;
-    }
     public Player getPlayersTurn(){
         return playersTurn;
     }
@@ -170,4 +146,5 @@ public class Room {
     public void setPlayers(HashMap<String, Player> players) {
         this.players = players;
     }
+
 }
