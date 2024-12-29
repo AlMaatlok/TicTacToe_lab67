@@ -3,7 +3,6 @@ package server;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -16,18 +15,20 @@ public class RoomServiceImpl extends UnicastRemoteObject implements RoomServiceI
 
     @Override
     public String createRoom(String password, String roomName)  {
+        if(rooms.values().stream().anyMatch(room -> room.getRoomName().equals(roomName)))
+            return "Can't create new room with room name " + roomName +". Room with that name already exists! Try again";
+
         String token = UUID.randomUUID() + "@" + roomName;
 
         if(rooms.containsKey(token))
             return "Can't create new room with token " + token +". Room with that token already exists! Try again";
 
-        rooms.put(token, new Room(token, password, roomName));
+        rooms.put(token, new Room(roomName, password, token));
         return "Created room named " + roomName + ". You can connect to it via token " + token;
     }
     @Override
     public int joinRoom(String playerToken, String roomToken, String password)  {
         if (!rooms.containsKey(roomToken)) {
-            //System.out.println("Room doesn't exist.");
             return 0;
         }
 
@@ -139,11 +140,13 @@ public class RoomServiceImpl extends UnicastRemoteObject implements RoomServiceI
     }
 
     @Override
-    public void listRooms()  {
+    public String listRooms()  {
+        StringBuilder sb = new StringBuilder();
         for(Map.Entry<String, Room> entry : rooms.entrySet()){
             Room room = entry.getValue();
-            System.out.println("Room: " + room.getRoomName() + ", token: " + room.getRoomToken() + ", number of players: " + room.getPlayersNumber() + "/2\\n");
+            sb.append("Room: ").append(room.getRoomName()).append(", token: ").append(room.getRoomToken()).append(", number of players: ").append(room.getPlayersNumber()).append("/2").append("\n");
         }
+        return sb.toString();
     }
 
 }

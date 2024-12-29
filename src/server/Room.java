@@ -28,13 +28,13 @@ public class Room {
 
         if(players.isEmpty()){
             players.put("X", new Player(playerName));
-            System.out.println("Player " + playerName + " joined the game");
+            System.out.println("Player " + playerName + " joined the game as player X");
             System.out.println("Number of players: " + players.size());
             return 1;
         }
         else{
             players.put("O", new Player(playerName));
-            System.out.println("Player " + playerName + " joined the game");
+            System.out.println("Player " + playerName + " joined the game as player O");
             System.out.println("Number of players: " + players.size());
             return 2;
         }

@@ -38,9 +38,9 @@ public class Player {
     }
     public Map<String, Integer> getStats(){
         Map<String, Integer> stats = new HashMap<>();
-        stats.put("wins", getWins());
-        stats.put("losses", getLosses());
-        stats.put("draws", getDraws());
+        stats.put("Wins", getWins());
+        stats.put("Losses", getLosses());
+        stats.put("Draws", getDraws());
 
         return stats;
     }

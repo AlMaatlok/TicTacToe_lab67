@@ -30,7 +30,7 @@ public interface RoomServiceInterface extends Remote{
 
     String checkWinner(String roomToken) throws RemoteException;
 
-    void listRooms() throws RemoteException;
+    String listRooms() throws RemoteException;
 
 
 }
