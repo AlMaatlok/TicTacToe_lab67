@@ -21,7 +21,8 @@ public class UI {
         System.out.println("2. List all rooms");
         System.out.println("3. Join room");
         System.out.println("4. Delete room");
-        System.out.println("5. Type 'exit' to end the program");
+        System.out.println("5. Watch a game");
+        System.out.println("6. Type 'exit' to end the program");
 
         System.out.println("Choose an option:");
         String choice = scan.nextLine();
@@ -45,6 +46,10 @@ public class UI {
 
                     case "4":
                         deleteRoomUI(scan);
+                        break;
+
+                    case "5":
+                        watchAGameUI(scan);
                         break;
 
                     default:
@@ -73,7 +78,8 @@ public class UI {
         System.out.println("2. List all rooms");
         System.out.println("3. Join room");
         System.out.println("4. Delete room");
-        System.out.println("5. Type 'exit' to end the program");
+        System.out.println("5. Watch a game");
+        System.out.println("6. Type 'exit' to end the program");
         System.out.println("Choose an option:");
 
         String choice = scan.nextLine();
@@ -99,6 +105,10 @@ public class UI {
                         deleteRoomUI(scan);
                         break;
 
+                    case "5":
+                        watchAGameUI(scan);
+                        break;
+
                     default:
                         System.out.println("Invalid choice. Try again.");
                         mainMenuUI(scan);
@@ -122,7 +132,8 @@ public class UI {
         System.out.println("2. Create a room");
         System.out.println("3. Join room");
         System.out.println("4. Delete room");
-        System.out.println("5. Type 'exit' to end the program");
+        System.out.println("5. Watch a game");
+        System.out.println("6. Type 'exit' to end the program");
 
         System.out.println("Choose an option:");
         String choice = scan.nextLine();
@@ -146,6 +157,10 @@ public class UI {
 
                     case "4":
                         deleteRoomUI(scan);
+                        break;
+
+                    case "5":
+                        watchAGameUI(scan);
                         break;
 
                     default:
@@ -284,6 +299,42 @@ public class UI {
 
         }
 
+    }
+
+    public void watchAGameUI(Scanner scan) throws RemoteException {
+        clearConsole();
+        System.out.println("==================================");
+        System.out.println("You have entered spactator mode!");
+        System.out.println("You can connect and view games between 2 players in chosen room");
+        System.out.println(Main.roomService.listRooms());
+        System.out.println("Provide token of the room you want to watch: ");
+        String roomToken = scan.nextLine();
+
+        boolean ifExist = Main.roomService.hasRoomWithToken(roomToken);
+
+        if(ifExist){
+            System.out.println("Room with this token doesnt exist.");
+            System.out.println("1. Continue");
+            System.out.println("2. Type anything else to go back to main meny");
+            String choice = scan.nextLine();
+
+            if(choice.equals("1")){
+                watchAGameUI(scan);
+            }
+            else mainMenuUI(scan);
+        }
+
+        if(Main.roomService.checkPlayersInRoom(roomToken) != 2){
+            System.out.println("You can only enter a room with two players.");
+            System.out.println("1. Continue");
+            System.out.println("2. Type anything else to go back to main meny");
+            String choice = scan.nextLine();
+
+            if(choice.equals("1")){
+                watchAGameUI(scan);
+            }
+            else mainMenuUI(scan);
+        }
     }
 
     public void clearConsole()

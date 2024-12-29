@@ -2,6 +2,9 @@ package client;
 
 import server.RoomServiceInterface;
 
+import java.io.*;
+import java.net.Socket;
+import java.nio.charset.StandardCharsets;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.util.Scanner;
@@ -19,6 +22,7 @@ public class Main {
     static String host;
 
     static int port;
+    static Socket observantSocket;
 
     public static void main(String[] args) {
         host = "127.0.0.1";
@@ -56,5 +60,16 @@ public class Main {
             System.out.println("Client failed: " + e.getMessage());
             e.printStackTrace();
         }
+    }
+    private String socketMessage(String message, String roomToken) throws IOException {
+
+        BufferedReader reader = new BufferedReader(new InputStreamReader(Main.observantSocket.getInputStream(), StandardCharsets.UTF_8));
+        BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(Main.observantSocket.getOutputStream(), StandardCharsets.UTF_8));
+
+        writer.write(message + ":" + roomToken);
+        writer.newLine();
+        writer.flush();
+
+        return reader.readLine();
     }
 }
