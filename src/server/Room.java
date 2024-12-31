@@ -17,24 +17,25 @@ public class Room {
         this.setPassword(password);
         this.setRoomToken(roomToken);
         this.players = new HashMap();
-        this.gameEngine = new GameEngine();
+        this.gameEngine = new GameEngine(new String[3][3]);
+        this.gameEngine.initializeBoard();
 
     }
-    public int joinRoom(String playerName, String password) {
+    public int joinRoom(String playerToken, String password) {
         if(!password.equals(this.password)) {
             return -1;
         }
         if(getPlayersNumber() >= 2) return -2;
 
         if(players.isEmpty()){
-            players.put("X", new Player(playerName));
-            System.out.println("Player " + playerName + " joined the game as player X");
+            players.put("X", new Player(playerToken));
+            System.out.println("Player " + playerToken + " joined the game as player X");
             System.out.println("Number of players: " + players.size());
             return 1;
         }
         else{
-            players.put("O", new Player(playerName));
-            System.out.println("Player " + playerName + " joined the game as player O");
+            players.put("O", new Player(playerToken));
+            System.out.println("Player " + playerToken + " joined the game as player O");
             System.out.println("Number of players: " + players.size());
             return 2;
         }
@@ -47,6 +48,7 @@ public class Room {
         }
 
         players.values().remove(player);
+        System.out.println("Player " + player.getPlayerToken() + " left the game");
         return true;
     }
 
@@ -55,7 +57,7 @@ public class Room {
         gameEngine.resetGame();
     }
     public String getBoardInfo(){
-        char[][] board = gameEngine.getBoard();
+        String[][] board = gameEngine.getBoard();
 
         return  " ┌───┬───┬───┐\n" +
                 " | " + board[0][0] + " | " + board[0][1] + " | " + board[0][2] + " |\n" +
@@ -66,35 +68,46 @@ public class Room {
                 " └───┴───┴───┘";
 
     }
+    public void initilizeBoard(){
+        gameEngine.initializeBoard();
+    }
 
     public String getPlayerWhosTurn(){
-        return (gameEngine.getCurrentPlayer() == 'X') ? "X" : "O";
+        char currentSymbol = gameEngine.getCurrentPlayer();
+        Player currentPlayer = players.get(String.valueOf(currentSymbol));
+        return (currentPlayer != null) ? currentPlayer.getPlayerToken() : "No player";
     }
 
-    public boolean isYourTurn(Player player){
-        String currentPlayerToken = getPlayerWhosTurn();
-        if (players.get(currentPlayerToken) == player) {
-            return true;
-        }
-        return false;
+    public boolean isYourTurn(String playerToken){
+        char currentSymbol = gameEngine.getCurrentPlayer();
+        Player currentPlayer = players.get(String.valueOf(currentSymbol));
+        return currentPlayer != null && currentPlayer.getPlayerToken().equals(playerToken);
     }
-    public boolean makeMove(Player player, int row, int col) {
-        String playerToken = (players.get("X") == player) ? "X" : "O";
-        if (gameEngine.makeMove(row, col)) {
-            String winnerStatus = checkWinner();
+    public boolean makeMove(int row, int col) {
+        char currentSymbol = gameEngine.getCurrentPlayer();
+        String symbol = String.valueOf(currentSymbol);
+
+        if(gameEngine.isMoveValid(row, col)){
+            gameEngine.makeMove(symbol, row, col);
+            gameEngine.switchPlayer();
             return true;
         }
-        return false;
+        else {
+            System.out.println("Invalid move. Try again");
+            return false;
+
+        }
+
     }
 
     public String checkWinner() {
-        char winner = gameEngine.checkWinner();
+        String winner = gameEngine.checkWinner();
 
-        if (winner == 'X') {
+        if (winner == "X") {
             players.get("X").incrementWins();
             players.get("O").incrementLosses();
             return "Player X won!";
-        } else if (winner == 'O') {
+        } else if (winner == "O") {
             players.get("O").incrementWins();
             players.get("X").incrementLosses();
             return "Player O won!";

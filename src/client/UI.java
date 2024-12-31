@@ -11,7 +11,6 @@ public class UI {
     }
 
     public void mainMenuUI(Scanner scan) {
-        clearConsole();
 
         System.out.println("==============================================");
         System.out.println("Player: " + Main.playerName);
@@ -33,26 +32,32 @@ public class UI {
             } else {
                 switch (choice) {
                     case "1":
+                        clearConsole();
                         createRoomUI(scan);
                         break;
 
                     case "2":
+                        clearConsole();
                         listAllRoomsUI(scan);
                         break;
 
                     case "3":
+                        clearConsole();
                         joinRoomUI(scan);
                         break;
 
                     case "4":
+                        clearConsole();
                         deleteRoomUI(scan);
                         break;
 
                     case "5":
+                        clearConsole();
                         watchAGameUI(scan);
                         break;
 
                     default:
+                        clearConsole();
                         System.out.println("Invalid choice. Try again.");
                         mainMenuUI(scan);
                         break;
@@ -63,8 +68,6 @@ public class UI {
         }
     }
     public void createRoomUI(Scanner scan) throws RemoteException {
-        clearConsole();
-
         System.out.println("Player: " + Main.playerName);
         System.out.println("Provide name of the room: ");
         String roomName = scan.nextLine();
@@ -90,26 +93,32 @@ public class UI {
             } else {
                 switch (choice) {
                     case "1":
+                        clearConsole();
                         mainMenuUI(scan);
                         break;
 
                     case "2":
+                        clearConsole();
                         listAllRoomsUI(scan);
                         break;
 
                     case "3":
+                        clearConsole();
                         joinRoomUI(scan);
                         break;
 
                     case "4":
+                        clearConsole();
                         deleteRoomUI(scan);
                         break;
 
                     case "5":
+                        clearConsole();
                         watchAGameUI(scan);
                         break;
 
                     default:
+                        clearConsole();
                         System.out.println("Invalid choice. Try again.");
                         mainMenuUI(scan);
                         break;
@@ -120,8 +129,6 @@ public class UI {
     }
 
     public void listAllRoomsUI(Scanner scan) throws RemoteException {
-        clearConsole();
-
         System.out.println("Player: " + Main.playerName);
         System.out.println("=====================================");
         System.out.println("Rooms:");
@@ -144,26 +151,32 @@ public class UI {
             } else {
                 switch (choice) {
                     case "1":
+                        clearConsole();
                         mainMenuUI(scan);
                         break;
 
                     case "2":
+                        clearConsole();
                         createRoomUI(scan);
                         break;
 
                     case "3":
+                        clearConsole();
                         joinRoomUI(scan);
                         break;
 
                     case "4":
+                        clearConsole();
                         deleteRoomUI(scan);
                         break;
 
                     case "5":
+                        clearConsole();
                         watchAGameUI(scan);
                         break;
 
                     default:
+                        clearConsole();
                         System.out.println("Invalid choice. Try again.");
                         mainMenuUI(scan);
                         break;
@@ -175,8 +188,6 @@ public class UI {
     }
 
     public void joinRoomUI(Scanner scan) throws RemoteException, InterruptedException {
-        clearConsole();
-
         System.out.println("Player: " + Main.playerName);
         System.out.println("========================================");
         System.out.println("Provide token of the room you want to join: ");
@@ -192,30 +203,33 @@ public class UI {
 
         clearConsole();
         if(status == -2) {
+            clearConsole();
             System.out.println("There is 2 players already. You can only spectate.");
             mainMenuUI(scan);
         }
         else if(status == -1){
+            clearConsole();
             System.out.println("Password is incorrect");
             mainMenuUI(scan);
         }
         else if(status == 0){
+            clearConsole();
             System.out.println("Room with given token doesnt exist");
             mainMenuUI(scan);
         }
         else if(status == 1){
+            clearConsole();
             System.out.println("Joined as a first player!");
             soloRoomUI(scan);
         }
         else if(status == 2){
+            clearConsole();
             System.out.println("Joined as a second player!");
             activeRoomUI(scan);
         }
     }
 
     public void deleteRoomUI(Scanner scan) throws RemoteException {
-        clearConsole();
-
         System.out.println("Player: " + Main.playerName);
         System.out.println("======================================");
         System.out.println(Main.roomService.listRooms());
@@ -228,22 +242,23 @@ public class UI {
         int status = Main.roomService.deleteRoom(roomToken, password);
 
         if(status == 1){
+            clearConsole();
             System.out.println("Room has been deleted");
             mainMenuUI(scan);
         }
         else if(status == -1){
+            clearConsole();
             System.out.println("Room with given token doesnt exist");
             mainMenuUI(scan);
         }
         else if(status == -2){
+            clearConsole();
             System.out.println("Wrong password");
             mainMenuUI(scan);
         }
     }
 
     public void soloRoomUI(Scanner scan) throws RemoteException, InterruptedException {
-        clearConsole();
-
         System.out.println("Player: " + Main.playerName);
         System.out.println("Room: " + Main.connectedRoomToken);
         System.out.println("=====================================");
@@ -259,8 +274,8 @@ public class UI {
                 activeRoomUI(scan);
             }
 
-            Thread.sleep(5000);
-            if(++iteration % 20 == 0){
+            Thread.sleep(3000);
+            if(++iteration % 15 == 0){
                 System.out.println("Do you wish to continue waiting? <Y><N>");
                 String choice = scan.nextLine();
                 if(choice.contains("N"))
@@ -269,11 +284,9 @@ public class UI {
         }
 
     }
-    public void activeRoomUI(Scanner scan) throws RemoteException {
-        clearConsole();
-
+    public void activeRoomUI(Scanner scan) throws RemoteException, InterruptedException {
         String opponentName = Main.roomService.getOponent(Main.connectedRoomToken, Main.playerToken);
-        boolean isYourTurn = Main.roomService.isYourTurn(Main.playerToken);
+        boolean isYourTurn = Main.roomService.isYourTurn(Main.connectedRoomToken, Main.playerToken);
         String board = Main.roomService.getBoardInfo(Main.connectedRoomToken);
 
         System.out.println("Player: " + Main.playerName);
@@ -282,29 +295,65 @@ public class UI {
         System.out.println("Your opponent: " + opponentName);
         System.out.println();
         System.out.println("=======================================");
+
+
         System.out.println(board);
         System.out.println();
 
-        if(isYourTurn){
-            System.out.println("Your turn");
+            if (isYourTurn) {
+                System.out.println("Your turn");
+                System.out.println("Give number of the row and column:");
 
-            System.out.println("Type number of the row: ");
-            int row = scan.nextInt();
+                System.out.println("Type number of the row: ");
+                int row = scan.nextInt() - 1;
+                scan.nextLine();
 
-            System.out.println("Type number of the column: ");
-            int column = scan.nextInt();
+                System.out.println("Type number of the column: ");
+                int column = scan.nextInt() - 1;
+                scan.nextLine();
+
+                if (Main.roomService.makeMove(Main.connectedRoomToken, Main.playerToken, row, column)) {
+                    System.out.println("Move successful!");
+                } else {
+                    Thread.sleep(1000);
+                    System.out.println("Invalid move. Try again.");
+                }
 
 
+            } else {
+                System.out.println("It's not your turn.");
+                System.out.println("Wait for the other player to make a move.");
 
+                int iteration = 0;
+                while(!isYourTurn) {
+                    Thread.sleep(1000);
+                    String winner = Main.roomService.checkWinner(Main.connectedRoomToken);
+                    isYourTurn = Main.roomService.isYourTurn(Main.connectedRoomToken, Main.playerToken);
+                    System.out.println("winner: " + winner);
+                    System.out.println("yor turn: "+ isYourTurn);
 
-        }
+                    if(winner.equals("X") || winner.equals("O")){
+                        break;
+                    }
+                    if (++iteration % 100 == 0) {
+                        System.out.println("Do you wish to continue waiting? <Y><N>");
+                        String choice1 = scan.next().trim().toUpperCase();
+                        if (choice1.contains("N"))
+                            mainMenuUI(scan);
+                    }
+                }
+                if(isYourTurn){
+                    System.out.println("Your turn");
+                    activeRoomUI(scan);
+                    return;
+                }
+            }
 
     }
 
     public void watchAGameUI(Scanner scan) throws RemoteException {
-        clearConsole();
         System.out.println("==================================");
-        System.out.println("You have entered spactator mode!");
+        System.out.println("You have entered spectator mode!");
         System.out.println("You can connect and view games between 2 players in chosen room");
         System.out.println(Main.roomService.listRooms());
         System.out.println("Provide token of the room you want to watch: ");
@@ -312,10 +361,10 @@ public class UI {
 
         boolean ifExist = Main.roomService.hasRoomWithToken(roomToken);
 
-        if(ifExist){
+        if(!ifExist){
             System.out.println("Room with this token doesnt exist.");
             System.out.println("1. Continue");
-            System.out.println("2. Type anything else to go back to main meny");
+            System.out.println("2. Type anything else to go back to main menu");
             String choice = scan.nextLine();
 
             if(choice.equals("1")){
@@ -327,7 +376,7 @@ public class UI {
         if(Main.roomService.checkPlayersInRoom(roomToken) != 2){
             System.out.println("You can only enter a room with two players.");
             System.out.println("1. Continue");
-            System.out.println("2. Type anything else to go back to main meny");
+            System.out.println("2. Type anything else to go back to main menu");
             String choice = scan.nextLine();
 
             if(choice.equals("1")){
@@ -335,6 +384,8 @@ public class UI {
             }
             else mainMenuUI(scan);
         }
+
+        System.out.println("Watching");
     }
 
     public void clearConsole()

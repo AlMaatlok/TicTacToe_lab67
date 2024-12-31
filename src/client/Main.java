@@ -34,6 +34,7 @@ public class Main {
             } else if (args[i].equals("-p") && i + 1 < args.length) {
                 try {
                     port = Integer.parseInt(args[i + 1]);
+                    System.out.println("New client connected");
                 } catch (NumberFormatException e) {
                     System.out.println("Invalid port number. Using default port 1099.");
                 }

@@ -43,7 +43,7 @@ public class RoomServiceImpl extends UnicastRemoteObject implements RoomServiceI
         }
         Room room = rooms.get(roomToken);
         boolean playerRemoved = room.getPlayers().values()
-                .removeIf(player -> player.getPlayerName().equals(playerName));
+                .removeIf(player -> player.getPlayerToken().equals(playerName));
         return playerRemoved ? 1 : -1; // 1 oznacza sukces, -1 brak gracza w pokoju
 
     }
@@ -55,8 +55,8 @@ public class RoomServiceImpl extends UnicastRemoteObject implements RoomServiceI
         }
 
         Room room = rooms.get(roomToken);
-        if (room.getPlayers().containsKey("X") && room.getPlayers().get("X").getPlayerName().equals(playerToken) ||
-                room.getPlayers().containsKey("O") && room.getPlayers().get("O").getPlayerName().equals(playerToken)) {
+        if (room.getPlayers().containsKey("X") && room.getPlayers().get("X").getPlayerToken().equals(playerToken) ||
+                room.getPlayers().containsKey("O") && room.getPlayers().get("O").getPlayerToken().equals(playerToken)) {
             room.resetRoom();
             return 1;
         } else {
@@ -82,13 +82,14 @@ public class RoomServiceImpl extends UnicastRemoteObject implements RoomServiceI
     public String getOponent(String roomToken, String playerToken) {
         Room room = rooms.get(roomToken);
         String opponentToken = playerToken.equals("X") ? "O" : "X";
-        return room.getPlayers().get(opponentToken).getPlayerName();
+        return room.getPlayers().get(opponentToken).getPlayerToken();
     }
 
 
     @Override
-    public boolean isYourTurn(String playerToken) {
-        return rooms.containsKey(playerToken);
+    public boolean isYourTurn(String roomToken, String playerToken) {
+        Room room = rooms.get(roomToken);
+        return room.isYourTurn(playerToken);
     }
 
     @Override
@@ -127,8 +128,7 @@ public class RoomServiceImpl extends UnicastRemoteObject implements RoomServiceI
         }
 
         Room room = rooms.get(roomToken);
-        Player player = room.getPlayers().get(playerToken);
-        return room.makeMove(player, row, col);
+        return room.makeMove(row, col);
     }
 
     @Override
@@ -149,5 +149,9 @@ public class RoomServiceImpl extends UnicastRemoteObject implements RoomServiceI
         return sb.toString();
     }
 
+    @Override
+    public void initializeBoard(String roomToken){
+        rooms.get(roomToken).initilizeBoard();
+    }
 }
 
