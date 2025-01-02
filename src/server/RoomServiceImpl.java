@@ -35,19 +35,6 @@ public class RoomServiceImpl extends UnicastRemoteObject implements RoomServiceI
         Room room = rooms.get(roomToken);
         return room.joinRoom(playerToken, password);
     }
-
-    @Override
-    public int leaveRoom(String roomToken, String playerName) throws RemoteException {
-        if (!rooms.containsKey(roomToken)) {
-            return 0;
-        }
-        Room room = rooms.get(roomToken);
-        boolean playerRemoved = room.getPlayers().values()
-                .removeIf(player -> player.getPlayerToken().equals(playerName));
-        return playerRemoved ? 1 : -1; // 1 oznacza sukces, -1 brak gracza w pokoju
-
-    }
-
     @Override
     public int resetRoom(String playerToken, String roomToken)  {
         if (!rooms.containsKey(roomToken)) {
@@ -150,8 +137,12 @@ public class RoomServiceImpl extends UnicastRemoteObject implements RoomServiceI
     }
 
     @Override
-    public void initializeBoard(String roomToken){
-        rooms.get(roomToken).initilizeBoard();
+    public String getStats(String playerToken, String roomToken) {
+        if(!rooms.containsKey(roomToken)){
+            return "Room with this token does not exist";
+        }
+        else return rooms.get(roomToken).getStatistics(playerToken);
     }
+
 }
 

@@ -2,10 +2,11 @@ package client;
 
 import java.io.IOException;
 import java.rmi.RemoteException;
+import java.util.InputMismatchException;
 import java.util.Scanner;
 
 public class UI {
-    public void start() throws IOException, InterruptedException {
+    public void start() {
         Scanner scan = new Scanner(System.in);
         mainMenuUI(scan);
     }
@@ -219,12 +220,12 @@ public class UI {
         }
         else if(status == 1){
             clearConsole();
-            System.out.println("Joined as a first player!");
+            System.out.println("Joined as a first player! Your symbol: X");
             soloRoomUI(scan);
         }
         else if(status == 2){
             clearConsole();
-            System.out.println("Joined as a second player!");
+            System.out.println("Joined as a second player! Your symbol: O");
             activeRoomUI(scan);
         }
     }
@@ -288,10 +289,13 @@ public class UI {
         String opponentName = Main.roomService.getOponent(Main.connectedRoomToken, Main.playerToken);
         boolean isYourTurn = Main.roomService.isYourTurn(Main.connectedRoomToken, Main.playerToken);
         String board = Main.roomService.getBoardInfo(Main.connectedRoomToken);
+        String winner = Main.roomService.checkWinner(Main.connectedRoomToken);
+        String stats = Main.roomService.getStats(Main.playerToken, Main.connectedRoomToken);
 
-        System.out.println("Player: " + Main.playerName);
-        System.out.println("Room: " + Main.connectedRoomToken);
+        System.out.println("Stats:");
+        System.out.println(stats);
         System.out.println("=======================================");
+        System.out.println("Room: " + Main.connectedRoomToken);
         System.out.println("Your opponent: " + opponentName);
         System.out.println();
         System.out.println("=======================================");
@@ -300,23 +304,44 @@ public class UI {
         System.out.println(board);
         System.out.println();
 
+
+        if(!winner.equals("Game ongoing.")){
+            if(winner.equals("X") ||  winner.equals("O")){
+                System.out.println("Winner's symbol: " + winner);
+            }
+            else if(winner.equals("D")){
+                System.out.println("It's a draw");
+            }
+
+            System.out.println("===================================");
+            mainMenuUI(scan);
+            return;
+        }
+
             if (isYourTurn) {
                 System.out.println("Your turn");
                 System.out.println("Give number of the row and column:");
 
-                System.out.println("Type number of the row: ");
-                int row = scan.nextInt() - 1;
-                scan.nextLine();
-
-                System.out.println("Type number of the column: ");
-                int column = scan.nextInt() - 1;
-                scan.nextLine();
+                int row, column;
+                while (true) {
+                    try {
+                        System.out.print("Row (1-3): ");
+                        row = scan.nextInt() - 1;
+                        System.out.print("Column (1-3): ");
+                        column = scan.nextInt() - 1;
+                        scan.nextLine();
+                        break;
+                    } catch (InputMismatchException e) {
+                        System.out.println("Invalid input. Please enter numbers between 1 and 3.");
+                        scan.nextLine();
+                    }
+                }
 
                 if (Main.roomService.makeMove(Main.connectedRoomToken, Main.playerToken, row, column)) {
                     System.out.println("Move successful!");
                 } else {
+                    System.out.println("!!!!!!!!Invalid move. Try again.!!!!!!!!!!!!!!!!!");
                     Thread.sleep(1000);
-                    System.out.println("Invalid move. Try again.");
                 }
 
 
@@ -325,30 +350,26 @@ public class UI {
                 System.out.println("Wait for the other player to make a move.");
 
                 int iteration = 0;
-                while(!isYourTurn) {
-                    Thread.sleep(1000);
-                    String winner = Main.roomService.checkWinner(Main.connectedRoomToken);
-                    isYourTurn = Main.roomService.isYourTurn(Main.connectedRoomToken, Main.playerToken);
-                    System.out.println("winner: " + winner);
-                    System.out.println("yor turn: "+ isYourTurn);
 
-                    if(winner.equals("X") || winner.equals("O")){
+                while (!Main.roomService.isYourTurn(Main.connectedRoomToken, Main.playerToken)) {
+                    Thread.sleep(1000);
+                    winner = Main.roomService.checkWinner(Main.connectedRoomToken);
+                    if (!winner.equals("Game ongoing.")) {
                         break;
                     }
+
                     if (++iteration % 100 == 0) {
-                        System.out.println("Do you wish to continue waiting? <Y><N>");
-                        String choice1 = scan.next().trim().toUpperCase();
-                        if (choice1.contains("N"))
+                        System.out.println("Do you wish to continue waiting? <Y>/<N>");
+                        String choice = scan.next().trim().toUpperCase();
+                        if (choice.equals("N")) {
+                            System.out.println("You left the game");
                             mainMenuUI(scan);
+                            return;
+                        }
                     }
                 }
-                if(isYourTurn){
-                    System.out.println("Your turn");
-                    activeRoomUI(scan);
-                    return;
-                }
             }
-
+            activeRoomUI(scan);
     }
 
     public void watchAGameUI(Scanner scan) throws RemoteException {
@@ -358,6 +379,7 @@ public class UI {
         System.out.println(Main.roomService.listRooms());
         System.out.println("Provide token of the room you want to watch: ");
         String roomToken = scan.nextLine();
+        Main.connectedRoomToken = roomToken;
 
         boolean ifExist = Main.roomService.hasRoomWithToken(roomToken);
 
@@ -385,7 +407,61 @@ public class UI {
             else mainMenuUI(scan);
         }
 
-        System.out.println("Watching");
+        try {
+            while(true) {
+                clearConsole();
+                String[] players = Main.socketMessage("getPlayers", Main.connectedRoomToken).split(",");
+                String currentPlayer = Main.socketMessage("currentPlayer", Main.connectedRoomToken);
+                String board = Main.socketMessage("getBoardInfo", Main.connectedRoomToken);
+
+                System.out.println("====================================");
+                System.out.println("Watching");
+                System.out.println("Room: " + Main.connectedRoomToken);
+                System.out.println("Player number 1: " + players[0]);
+                System.out.println("Player number 2: " + players[1]);
+                System.out.println();
+                System.out.println("Current player: " + currentPlayer);
+                System.out.println();
+                System.out.println(board.replaceAll("\\*", "\n"));
+
+
+                String winner = Main.socketMessage("checkWinner", Main.connectedRoomToken);
+
+                if(!winner.equals("Game ongoing.")){
+                    if(winner.equals("X")){
+                        System.out.println("Winner's symbol: " + winner);
+                        mainMenuUI(scan);
+                    }
+                    else if(winner.equals("O")){
+                        System.out.println("Winner's symbol: " + winner);
+                        mainMenuUI(scan);
+                    }
+                    else if(winner.equals("D")){
+                        System.out.println("It's a draw");
+                        mainMenuUI(scan);
+                    }
+                }
+                String turn = currentPlayer;
+                int iteration = 0;
+                while(turn.equals(currentPlayer)){
+                    if(++iteration % 100 == 0){
+                        System.out.println("Do you wish to continue waiting? <Y><N>");
+                        if(scan.nextLine().contains("N"))
+                           mainMenuUI(scan);
+                    }
+                    Thread.sleep(1000);
+                    turn = Main.socketMessage("currentPlayer", roomToken);
+                }
+            }
+
+
+        }
+        catch (IOException e) {
+            e.printStackTrace();
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+        mainMenuUI(scan);
     }
 
     public void clearConsole()

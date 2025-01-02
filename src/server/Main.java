@@ -10,20 +10,20 @@ public class Main {
     static RoomServiceImpl roomService;
     public static void main(String[] args) {
 
-        int port = 1099;
+        try {
+            int port = 1099;
 
 
-        for (int i = 0; i < args.length; i++) {
-            if (args[i].equals("-p") && i + 1 < args.length) {
-                try {
-                    port = Integer.parseInt(args[i + 1]);
-                } catch (NumberFormatException e) {
-                    System.out.println("Invalid port number. Using default port 1099.");
+            for (int i = 0; i < args.length; i++) {
+                if (args[i].equals("-p") && i + 1 < args.length) {
+                    try {
+                        port = Integer.parseInt(args[i + 1]);
+                    } catch (NumberFormatException e) {
+                        System.out.println("Invalid port number. Using default port 1099.");
+                    }
                 }
             }
-        }
 
-        try {
             roomService = new RoomServiceImpl();
             Registry registry = LocateRegistry.createRegistry(port);
             registry.rebind("roomService", roomService);

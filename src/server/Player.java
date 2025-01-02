@@ -10,7 +10,8 @@ public class Player {
     private int losses;
     private int draws;
 
-    public Player( String playerToken) {
+    public Player( String playerName, String playerToken) {
+        this.playerName = playerName;
         this.playerToken = playerToken;
         this.wins = 0;
         this.losses = 0;
@@ -46,6 +47,16 @@ public class Player {
 
         return stats;
     }
+    public String printStats(){
+        Map<String, Integer> stats = getStats();
+        StringBuilder sb = new StringBuilder();
+        sb.append("Player: ").append(playerName).append("\n");
+        for(Map.Entry<String, Integer> entry : stats.entrySet()){
+            sb.append(entry.getKey()).append(": ").append(entry.getValue()).append("\n");
+        }
+        return sb.toString();
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

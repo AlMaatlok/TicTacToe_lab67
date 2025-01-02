@@ -1,5 +1,6 @@
 package server;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 
 
@@ -7,50 +8,48 @@ public class Room {
     String roomToken;
     String roomName;
     String password;
-    Player playersTurn;
     GameEngine gameEngine;
     boolean isGameInProgress;
     private HashMap<String, Player> players;
+    private ArrayList<Player> allPlayers;
+    private boolean isStatsUpdated = false;
 
     public Room(String roomName, String password, String roomToken) {
         this.setRoomName(roomName);
         this.setPassword(password);
         this.setRoomToken(roomToken);
         this.players = new HashMap();
+        this.allPlayers = new ArrayList();
         this.gameEngine = new GameEngine(new String[3][3]);
         this.gameEngine.initializeBoard();
 
     }
-    public int joinRoom(String playerToken, String password) {
+
+    public synchronized int joinRoom(String playerToken, String password) {
         if(!password.equals(this.password)) {
             return -1;
         }
         if(getPlayersNumber() >= 2) return -2;
 
+        String playerName = playerToken.split("@")[1];
+        Player newPlayer = new Player(playerName, playerToken);
+        allPlayers.add(newPlayer);
         if(players.isEmpty()){
-            players.put("X", new Player(playerToken));
-            System.out.println("Player " + playerToken + " joined the game as player X");
+            players.put("X", newPlayer);
+            System.out.println("Player " + playerName + " joined the game as player X");
             System.out.println("Number of players: " + players.size());
             return 1;
         }
         else{
-            players.put("O", new Player(playerToken));
-            System.out.println("Player " + playerToken + " joined the game as player O");
+            players.put("O", newPlayer);
+            System.out.println("Player " + playerName + " joined the game as player O");
             System.out.println("Number of players: " + players.size());
             return 2;
         }
 
     }
 
-    public boolean leaveRoom(Player player) {
-        if (player == null) {
-            return false;
-        }
 
-        players.values().remove(player);
-        System.out.println("Player " + player.getPlayerToken() + " left the game");
-        return true;
-    }
 
     public void resetRoom(){
         isGameInProgress = false;
@@ -67,9 +66,6 @@ public class Room {
                 " | " + board[2][0] + " | " + board[2][1] + " | " + board[2][2] + " |\n" +
                 " └───┴───┴───┘";
 
-    }
-    public void initilizeBoard(){
-        gameEngine.initializeBoard();
     }
 
     public String getPlayerWhosTurn(){
@@ -103,22 +99,49 @@ public class Room {
     public String checkWinner() {
         String winner = gameEngine.checkWinner();
 
-        if (winner == "X") {
-            players.get("X").incrementWins();
-            players.get("O").incrementLosses();
-            return "Player X won!";
-        } else if (winner == "O") {
-            players.get("O").incrementWins();
-            players.get("X").incrementLosses();
-            return "Player O won!";
+        if (!isStatsUpdated) {
+            if (winner.equals("X")) {
+                players.get("X").incrementWins();
+                players.get("O").incrementLosses();
+                System.out.println(players.get("O").printStats());
+                System.out.println(players.get("X").printStats());
+                isStatsUpdated = true;
+                System.out.println("Game ended. Player X wins!");
+            } else if (winner.equals("O")) {
+                players.get("O").incrementWins();
+                players.get("X").incrementLosses();
+                System.out.println(players.get("O").printStats());
+                System.out.println(players.get("X").printStats());
+                isStatsUpdated = true;
+                System.out.println("Game ended. Player O wins!");
+            } else if (gameEngine.isBoardFull()) {
+                players.get("O").incrementDraws();
+                players.get("X").incrementDraws();
+                System.out.println(players.get("O").printStats());
+                System.out.println(players.get("X").printStats());
+                isStatsUpdated = true;
+                System.out.println("Game ended. It's a draw.");
+            }
+        }
+
+        if (winner.equals("X")) {
+            return "X";
+        } else if (winner.equals("O")) {
+            return "O";
         } else if (gameEngine.isBoardFull()) {
-            players.get("O").incrementDraws();
-            players.get("X").incrementDraws();
-            return "It's a draw!";
+            return "D";
         }
         return "Game ongoing.";
     }
 
+    public String getStatistics(String playerToken){
+        for(Player player : allPlayers){
+            if(player.getPlayerToken().equals(playerToken)){
+                return player.printStats();
+            }
+        }
+        return "No statistics";
+    }
     public int getPlayersNumber(){
         return players.size();
     }
@@ -141,23 +164,12 @@ public class Room {
     public void setPassword(String password) {
         this.password = password;
     }
-    public boolean isGameInProgress() {
-        return isGameInProgress;
+    public Player getPlayer(String playerToken) {
+        return players.get(playerToken);
     }
-    public void setGameInProgress(boolean gameInProgress) {
-        isGameInProgress = gameInProgress;
-    }
-    public Player getPlayersTurn(){
-        return playersTurn;
-    }
-    public void setPlayersTurn(Player player){
-        playersTurn = player;
-    }
+
     public HashMap<String, Player> getPlayers() {
         return players;
-    }
-    public void setPlayers(HashMap<String, Player> players) {
-        this.players = players;
     }
 
 }

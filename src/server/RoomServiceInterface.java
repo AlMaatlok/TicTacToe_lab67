@@ -8,7 +8,6 @@ public interface RoomServiceInterface extends Remote{
 
     int joinRoom(String playerToken, String roomToken, String password) throws RemoteException;
 
-    int leaveRoom(String playerToken, String roomToken) throws RemoteException;
 
     int resetRoom(String playerToken, String roomToken) throws RemoteException;
 
@@ -32,7 +31,5 @@ public interface RoomServiceInterface extends Remote{
 
     String listRooms() throws RemoteException;
 
-    void initializeBoard(String roomToken) throws RemoteException;
-
-
+    String getStats(String playerToken, String roomToken) throws RemoteException;
 }
