@@ -39,13 +39,9 @@ public class Main {
                 clientTread.start();
             }
 
-        } catch (RemoteException e) {
+        } catch (Exception e) {
             System.out.println("Error: " + e.getMessage());
             e.printStackTrace();
-        } catch (RuntimeException e) {
-            throw new RuntimeException(e);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
         }
     }
 }

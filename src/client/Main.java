@@ -58,7 +58,9 @@ public class Main {
             System.out.println("Welcome, " + playerToken.split("@")[1] + "!");
             System.out.println();
 
-            UIHandler.start();
+            while(true) {
+                UIHandler.start();
+            }
 
         } catch (Exception e) {
             System.out.println("Client failed: " + e.getMessage());

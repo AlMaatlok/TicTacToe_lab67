@@ -440,6 +440,7 @@ public class UI {
                         System.out.println("It's a draw");
                         mainMenuUI(scan);
                     }
+                    Main.connectedRoomToken = "";
                 }
                 String turn = currentPlayer;
                 int iteration = 0;
