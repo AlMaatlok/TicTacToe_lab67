@@ -22,7 +22,6 @@ public class Room {
         this.allPlayers = new ArrayList<>();
         this.gameEngine = new GameEngine(new String[3][3]);
         this.gameEngine.initializeBoard();
-
     }
 
     public synchronized int joinRoom(String playerToken, String password) {
@@ -164,9 +163,6 @@ public class Room {
     }
     public void setPassword(String password) {
         this.password = password;
-    }
-    public Player getPlayer(String playerToken) {
-        return players.get(playerToken);
     }
 
     public HashMap<String, Player> getPlayers() {

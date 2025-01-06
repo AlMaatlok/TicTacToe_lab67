@@ -32,4 +32,5 @@ public interface RoomServiceInterface extends Remote{
     String listRooms() throws RemoteException;
 
     String getStats(String playerToken, String roomToken) throws RemoteException;
+
 }

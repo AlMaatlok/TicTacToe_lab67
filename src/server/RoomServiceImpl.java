@@ -2,12 +2,14 @@ package server;
 
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
 public class RoomServiceImpl extends UnicastRemoteObject implements RoomServiceInterface {
     private static Map<String, Room> rooms = new HashMap<>();
+    private static ArrayList<Player> players = new ArrayList<>();
 
     public RoomServiceImpl()  throws RemoteException {
         super();
@@ -144,5 +146,7 @@ public class RoomServiceImpl extends UnicastRemoteObject implements RoomServiceI
         }
         else return rooms.get(roomToken).getStatistics(playerToken);
     }
+
+
 }
 
