@@ -18,8 +18,8 @@ public class Room {
         this.setRoomName(roomName);
         this.setPassword(password);
         this.setRoomToken(roomToken);
-        this.players = new HashMap();
-        this.allPlayers = new ArrayList();
+        this.players = new HashMap<>();
+        this.allPlayers = new ArrayList<>();
         this.gameEngine = new GameEngine(new String[3][3]);
         this.gameEngine.initializeBoard();
 
@@ -142,6 +142,7 @@ public class Room {
         }
         return "No statistics";
     }
+
     public int getPlayersNumber(){
         return players.size();
     }

@@ -13,6 +13,7 @@ import java.util.UUID;
 public class Main {
 
     static String playerToken;
+
     static String playerName;
 
     static RoomServiceInterface roomService;
@@ -22,6 +23,7 @@ public class Main {
     static String host;
 
     static int port;
+
     static Socket observantSocket;
 
     public static void main(String[] args) {

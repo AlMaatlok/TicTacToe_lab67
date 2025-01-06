@@ -68,7 +68,8 @@ public class RoomServiceImpl extends UnicastRemoteObject implements RoomServiceI
     @Override
     public String getOponent(String roomToken, String playerToken) {
         Room room = rooms.get(roomToken);
-        String opponentToken = playerToken.equals("X") ? "O" : "X";
+        String opponentToken = playerToken.equals(room.getPlayers().get("X").getPlayerToken()) ? "O" : "X";
+
         return room.getPlayers().get(opponentToken).getPlayerToken();
     }
 
@@ -143,6 +144,5 @@ public class RoomServiceImpl extends UnicastRemoteObject implements RoomServiceI
         }
         else return rooms.get(roomToken).getStatistics(playerToken);
     }
-
 }
 

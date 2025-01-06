@@ -126,6 +126,7 @@ public class UI {
                 }
             }
         }catch (Exception e) {
+            e.printStackTrace();
         }
     }
 
@@ -184,7 +185,7 @@ public class UI {
                 }
             }
         }catch (Exception e) {
-
+            e.printStackTrace();
         }
     }
 
@@ -312,7 +313,6 @@ public class UI {
             else if(winner.equals("D")){
                 System.out.println("It's a draw");
             }
-
             System.out.println("===================================");
             mainMenuUI(scan);
             return;
@@ -447,7 +447,7 @@ public class UI {
                 while(turn.equals(currentPlayer)){
                     if(++iteration % 100 == 0){
                         System.out.println("Do you wish to continue waiting? <Y><N>");
-                        if(scan.nextLine().contains("N"))
+                        if(scan.nextLine().contains("N") || scan.nextLine().contains("n"))
                            mainMenuUI(scan);
                     }
                     Thread.sleep(1000);

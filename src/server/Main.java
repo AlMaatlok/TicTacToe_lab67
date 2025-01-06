@@ -2,12 +2,12 @@ package server;
 
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 
 public class Main {
     static RoomServiceImpl roomService;
+
     public static void main(String[] args) {
 
         try {
